@@ -50,7 +50,7 @@ export default async function HomePage() {
                     Shop Now 🏍️
                   </button>
                 </SignInButton>
-                <Link href="/products">
+                <Link href="/items">
                   <button className="bg-gray-700 text-white border border-gray-600 px-8 py-4 rounded-lg font-medium hover:bg-gray-600 shadow-lg transition-all">
                     View Inventory
                   </button>
