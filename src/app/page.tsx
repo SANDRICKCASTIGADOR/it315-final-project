@@ -486,7 +486,7 @@ export default async function HomePage() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/products">
+                <Link href="/items">
                   <button className="bg-gradient-to-r from-red-600 to-orange-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:opacity-90 shadow-xl transform hover:-translate-y-1 transition-all">
                     Browse Motorcycles 🏍️
                   </button>

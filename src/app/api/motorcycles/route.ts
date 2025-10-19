@@ -1,7 +1,7 @@
-import { db } from '@/server/db';
-import { hardwareSpecs, apiKeys } from '@/server/db/schema';
 import { eq, ilike, or } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
+import { db } from '~/server/db';
+import { apiKeys, hardwareSpecs } from '~/server/db/schema';
 
 export async function GET(request: NextRequest) {
   try {
@@ -25,15 +25,9 @@ export async function GET(request: NextRequest) {
       .leftJoin(apiKeys, eq(hardwareSpecs.apiKeyId, apiKeys.id));
 
     // Apply search filter
-    if (search) {
-      query = query.where(
-        or(
-          ilike(hardwareSpecs.description, `%${search}%`),
-          ilike(apiKeys.name, `%${search}%`)
-        )
-      );
-    }
+    
 
+    // Execute the query
     let motorcycles = await query;
 
     // Apply sorting
