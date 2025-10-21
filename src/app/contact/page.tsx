@@ -69,7 +69,7 @@ export default function ContactPage() {
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white px-6 py-4 rounded-lg font-bold text-lg hover:opacity-90 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+                className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white px-6 py-4 rounded-lg font-bold text-lg hover:opacity-90 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
               >
                 Send Message 🏍️
               </button>

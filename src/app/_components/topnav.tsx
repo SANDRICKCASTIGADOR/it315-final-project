@@ -34,7 +34,7 @@ export default function TopNav() {
                             
                             {/* Sign In Button */}
                             <SignInButton>
-                                <button className="bg-gradient-to-r from-red-600 to-orange-600 text-white px-5 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-transform text-sm">
+                                <button className="bg-gradient-to-r from-red-600 to-orange-600 text-white px-5 py-2 rounded-lg font-medium hover:opacity-90  shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-transform text-sm">
                                     Sign In
                                 </button>
                             </SignInButton>

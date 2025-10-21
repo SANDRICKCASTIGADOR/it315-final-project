@@ -93,7 +93,7 @@ export default function CartPage() {
                 </div>
               </div>
               
-              <button className="mt-4 lg:mt-0 bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-3 rounded-lg hover:opacity-90 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all font-medium">
+              <button className="mt-4 lg:mt-0 bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-3 rounded-lg hover:opacity-90 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all font-medium">
                 Remove
               </button>
             </div>
@@ -120,7 +120,7 @@ export default function CartPage() {
           </div>
           
           <div className="mt-8 space-y-3">
-            <button className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white px-6 py-4 rounded-lg font-bold text-lg hover:opacity-90 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all">
+            <button className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white px-6 py-4 rounded-lg font-bold text-lg hover:opacity-90  shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all">
               Proceed to Checkout 🏁
             </button>
             <button className="w-full bg-gray-700 text-gray-300 px-6 py-3 rounded-lg font-medium hover:bg-gray-600 transition">
