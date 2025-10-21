@@ -50,7 +50,7 @@ export default async function HomePage() {
                     Shop Now 🏍️
                   </button>
                 </SignInButton>
-                <Link href="/items">
+                <Link href="/items/">
                   <button className="bg-gray-700 text-white border border-gray-600 px-8 py-4 rounded-lg font-medium hover:bg-gray-600 shadow-lg transition-all">
                     View Inventory
                   </button>
@@ -117,7 +117,7 @@ export default async function HomePage() {
                     Check out our latest additions
                   </p>
                 </div>
-                <Link href="/products">
+                <Link href="/items">
                   <button className="bg-gradient-to-r from-red-600 to-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-all shadow-lg">
                     View All Models →
                   </button>
@@ -128,7 +128,7 @@ export default async function HomePage() {
                 {featuredListings.map((listing) => (
                   <Link
                     key={listing.id}
-                    href={`/products/${listing.id}`}
+                    href={`/items/${listing.id}`}
                     className="group"
                   >
                     <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border border-gray-700 shadow-xl hover:border-red-600 transition-all overflow-hidden transform hover:-translate-y-2">
@@ -167,10 +167,7 @@ export default async function HomePage() {
                               <span className="text-xs text-gray-400 font-medium">
                                 Monthly
                               </span>
-                              <span className="font-bold text-red-500 flex items-center text-sm">
-                                <DollarSign size={14} />
-                                {listing.monthlyPrice}/mo
-                              </span>
+                              <span className="mr-1">₱{listing.monthlyPrice}</span>
                             </div>
                           )}
                           {listing.fullyPaidPrice && (
@@ -178,17 +175,10 @@ export default async function HomePage() {
                               <span className="text-xs text-gray-400 font-medium">
                                 Full Price
                               </span>
-                              <span className="font-bold text-green-500 flex items-center text-sm">
-                                <DollarSign size={14} />
-                                {listing.fullyPaidPrice}
-                              </span>
+                              <span className="mr-1">₱{listing.fullyPaidPrice}</span>
                             </div>
                           )}
                         </div>
-
-                        <button className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white py-3 rounded-lg font-semibold group-hover:from-red-700 group-hover:to-orange-700 transition-all shadow-lg">
-                          View Details →
-                        </button>
                       </div>
                     </div>
                   </Link>
@@ -491,11 +481,7 @@ export default async function HomePage() {
                     Browse Motorcycles 🏍️
                   </button>
                 </Link>
-                <Link href="/products">
-                  <button className="bg-gray-700 text-white border border-gray-600 px-8 py-4 rounded-lg font-medium hover:bg-gray-600 shadow-lg transition-all">
-                    View All Models
-                  </button>
-                </Link>
+                
               </div>
             </div>
           </div>

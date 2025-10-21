@@ -15,12 +15,13 @@ export const apiKeys = createTable("api_keys", {
   revoked: boolean("revoked").notNull().default(false),
 });
 
-// Hardware Specs table (Motor Listings)
-export const hardwareSpecs = createTable("hardware_specs", {
+// Motor Specs table (renamed from hardwareSpecs for consistency)
+export const motorSpecs = createTable("motor_specs", {
   id: text("id").primaryKey(),
   apiKeyId: text("api_key_id")
     .notNull()
     .references(() => apiKeys.id, { onDelete: "cascade" }),
+  motorName: varchar("motor_name", { length: 256 }).notNull(),
   frontView: text("front_view"),
   sideView: text("side_view"),
   backView: text("back_view"),
@@ -31,3 +32,6 @@ export const hardwareSpecs = createTable("hardware_specs", {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
 });
+
+// Keep the old name as an alias for backward compatibility if needed
+export const hardwareSpecs = motorSpecs;
