@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   Search,
   Eye,
@@ -57,9 +58,11 @@ function FullscreenModal({
         <X size={24} />
       </button>
       <div className="relative max-w-6xl max-h-[90vh] w-full h-full flex items-center justify-center">
-        <img
+        <Image
           src={imageUrl}
           alt={description}
+          width={1200}
+          height={800}
           className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         />
@@ -75,8 +78,7 @@ function ImageSlider({ images, description }: { images: (string | null)[]; descr
   const [currentIndex, setCurrentIndex] = useState(0);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
 
-  // Filter out null images
-  const validImages = images.filter((img) => img !== null) as string[];
+  const validImages = images.filter((img): img is string => img !== null);
 
   if (validImages.length === 0) {
     return (
@@ -107,8 +109,9 @@ function ImageSlider({ images, description }: { images: (string | null)[]; descr
   const openFullscreen = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (validImages[currentIndex]) {
-      setFullscreenImage(validImages[currentIndex]);
+    const currentImage = validImages[currentIndex];
+    if (currentImage) {
+      setFullscreenImage(currentImage);
     }
   };
 
@@ -117,18 +120,17 @@ function ImageSlider({ images, description }: { images: (string | null)[]; descr
   return (
     <>
       <div className="relative w-full h-full group/slider">
-        {/* Main Image */}
         <div className="relative w-full h-full overflow-hidden cursor-zoom-in" onClick={openFullscreen}>
-          <img
-            src={validImages[currentIndex]}
-            alt={`${description} - ${viewLabels[currentIndex]}`}
+          <Image
+            src={validImages[currentIndex] ?? ""}
+            alt={`${description} - ${viewLabels[currentIndex] ?? ""}`}
+            width={800}
+            height={600}
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
           />
 
-          {/* Gradient Overlays */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
 
-          {/* Zoom Icon Hint */}
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-opacity pointer-events-none">
             <div className="bg-black/60 backdrop-blur-sm p-3 rounded-full">
               <ZoomIn size={32} className="text-white" />
@@ -136,7 +138,6 @@ function ImageSlider({ images, description }: { images: (string | null)[]; descr
           </div>
         </div>
 
-        {/* Navigation Arrows - Only show if more than 1 image */}
         {validImages.length > 1 && (
           <>
             <button
@@ -154,7 +155,6 @@ function ImageSlider({ images, description }: { images: (string | null)[]; descr
           </>
         )}
 
-        {/* Dot Indicators */}
         {validImages.length > 1 && (
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-10">
             {validImages.map((_, index) => (
@@ -169,7 +169,6 @@ function ImageSlider({ images, description }: { images: (string | null)[]; descr
           </div>
         )}
 
-        {/* View Label */}
         <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm px-3 py-1 rounded-full z-10">
           <span className="text-white text-xs font-medium">{viewLabels[currentIndex]}</span>
         </div>
@@ -234,7 +233,7 @@ function PaymentModal({
         </button>
 
         <h2 className="text-2xl font-bold text-white mb-2">Complete Purchase</h2>
-        <p className="text-gray-400 mb-4">{bike.description || "Motor purchase"}</p>
+        <p className="text-gray-400 mb-4">{bike.description ?? "Motor purchase"}</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
           <div className="col-span-1">
@@ -297,7 +296,6 @@ export default function ItemsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Local UI state for payments
   const [selectedBike, setSelectedBike] = useState<MotorSpec | null>(null);
   const [purchasedMap, setPurchasedMap] = useState<Record<string, { method: string; receiptId: string }>>({});
 
@@ -306,9 +304,8 @@ export default function ItemsPage() {
       try {
         const res = await fetch("/api/motor-specs");
         if (!res.ok) throw new Error("Failed to fetch");
-        const data = await res.json();
-        // Coerce createdAt strings to Date (if necessary)
-        const normalized = data.map((d: any) => ({ ...d, createdAt: d.createdAt ? new Date(d.createdAt) : new Date() }));
+        const data: MotorSpec[] = await res.json();
+        const normalized = data.map((d) => ({ ...d, createdAt: d.createdAt ? new Date(d.createdAt) : new Date() }));
         setMotorSpecs(normalized);
         setFilteredMotorSpecs(normalized);
       } catch (error) {
@@ -318,7 +315,7 @@ export default function ItemsPage() {
       }
     }
 
-    fetchMotorSpecs();
+    void fetchMotorSpecs();
   }, []);
 
   useEffect(() => {
@@ -326,7 +323,7 @@ export default function ItemsPage() {
       setFilteredMotorSpecs(motorSpecs);
     } else {
       const term = searchTerm.toLowerCase();
-      const filtered = motorSpecs.filter((bike) => bike.description?.toLowerCase().includes(term) || bike.id.toLowerCase().includes(term));
+      const filtered = motorSpecs.filter((bike) => bike.description?.toLowerCase().includes(term) ?? bike.id.toLowerCase().includes(term));
       setFilteredMotorSpecs(filtered);
     }
   }, [searchTerm, motorSpecs]);
@@ -353,7 +350,6 @@ export default function ItemsPage() {
           <h1 className="text-5xl font-bold text-white mb-4">Browse Motors</h1>
           <p className="text-gray-400 text-lg mb-8">Found {filteredMotorSpecs.length} motor{filteredMotorSpecs.length !== 1 ? "s" : ""}</p>
 
-          {/* Search Bar */}
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <input
@@ -377,20 +373,16 @@ export default function ItemsPage() {
               <div key={bike.id} className="group">
                 <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border border-gray-700 shadow-xl hover:border-red-600 transition-all overflow-hidden transform hover:-translate-y-2 h-full flex flex-col">
 
-                  {/* Image Slider Section */}
                   <div className="relative h-72 bg-gradient-to-br from-red-900/20 to-orange-900/20 overflow-hidden">
-                    <ImageSlider images={[bike.frontView, bike.sideView, bike.backView]} description={bike.description || "Motor Spec"} />
+                    <ImageSlider images={[bike.frontView, bike.sideView, bike.backView]} description={bike.description ?? "Motor Spec"} />
                   </div>
 
-                  {/* Content Section */}
                   <div className="p-6 flex-1 flex flex-col">
-                    {/* Description */}
                     <div className="mb-6">
                       <h3 className="text-white font-bold text-lg mb-2">Description</h3>
-                      <p className="text-gray-300 text-sm leading-relaxed">{bike.description || 'Premium motor model with exceptional performance and reliability.'}</p>
+                      <p className="text-gray-300 text-sm leading-relaxed">{bike.description ?? 'Premium motor model with exceptional performance and reliability.'}</p>
                     </div>
 
-                    {/* Pricing */}
                     <div className="space-y-3 mt-auto">
                       {bike.monthlyPrice && (
                         <div className="bg-gradient-to-r from-red-900/30 to-red-800/30 border border-red-700/50 px-4 py-3 rounded-lg backdrop-blur-sm">
@@ -414,7 +406,6 @@ export default function ItemsPage() {
                         </div>
                       )}
 
-                      {/* Buy Button / Status */}
                       <div className="flex gap-3">
                         <button
                           onClick={() => setSelectedBike(bike)}
@@ -423,12 +414,10 @@ export default function ItemsPage() {
                           Buy Now
                         </button>
 
-                        {/* If purchased show receipt / method */}
                         {purchasedMap[bike.id] ? (
                           <div className="w-36 flex items-center justify-center px-3 py-2 rounded-lg bg-gray-800 border border-green-700">
                             <div>
                               <p className="text-xs text-gray-300">Purchased</p>
-                              
                             </div>
                           </div>
                         ) : (

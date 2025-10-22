@@ -9,7 +9,7 @@ export default function AboutPage() {
           </h1>
           <p className="text-xl leading-relaxed mb-4 text-gray-300 max-w-3xl mx-auto">
             Your ultimate destination for premium motorcycles and riding gear. 
-            We're passionate riders serving riders, bringing you the finest selection 
+            We&apos;re passionate riders serving riders, bringing you the finest selection 
             of bikes and accessories to fuel your passion for the open road.
           </p>
           <div className="flex justify-center items-center space-x-2 text-red-500">
@@ -51,7 +51,7 @@ export default function AboutPage() {
             <h2 className="text-2xl font-semibold mb-3 text-red-500">Our Mission</h2>
             <p className="text-gray-300 leading-relaxed">
               To provide riders with top-quality motorcycles and gear, ensuring every 
-              journey is safe, thrilling, and unforgettable. We're committed to building 
+              journey is safe, thrilling, and unforgettable. We&apos;re committed to building 
               a community of passionate riders.
             </p>
           </div>

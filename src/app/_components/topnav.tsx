@@ -46,7 +46,7 @@ export default function TopNav() {
                                 <Link href="/" className="text-gray-300 hover:text-red-500 font-medium transition-colors">
                                     Home
                                 </Link>
-                                <Link href="/payment" className="text-gray-300 hover:text-red-500 font-medium transition-colors">
+                                <Link href="/payments" className="text-gray-300 hover:text-red-500 font-medium transition-colors">
                                     Payments
                                 </Link>
                                 <UserButton/>
