@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   Search,
   Eye,
@@ -59,7 +60,7 @@ function FullscreenModal({
         <X size={24} />
       </button>
       <div className="relative max-w-6xl max-h-[90vh] w-full h-full flex items-center justify-center">
-        <img
+        <Image
           src={imageUrl}
           alt={description}
           className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
@@ -120,7 +121,7 @@ function ImageSlider({ images, description }: { images: (string | null)[]; descr
     <>
       <div className="relative w-full h-full group/slider">
         <div className="relative w-full h-full overflow-hidden cursor-zoom-in" onClick={openFullscreen}>
-          <img
+          <Image
             src={validImages[currentIndex] ?? ""}
             alt={`${description} - ${viewLabels[currentIndex] ?? ""}`}
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"

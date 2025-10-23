@@ -3,7 +3,7 @@ import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { desc } from "drizzle-orm";
 import Image from "next/image";
-import { DollarSign, Eye } from "lucide-react";
+import { Eye } from "lucide-react";
 import { hardwareSpecs } from "~/server/db/schema";
 import { db } from "~/server/db";
 

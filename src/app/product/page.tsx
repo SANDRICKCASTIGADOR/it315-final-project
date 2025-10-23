@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 interface MotorcycleSpec {
   id: string;
@@ -12,11 +13,6 @@ interface MotorcycleSpec {
   ram: string | null;
   storage: string | null;
   createdAt: string;
-}
-
-interface ApiResponse {
-  items?: MotorcycleSpec[];
-  results?: MotorcycleSpec[];
 }
 
 export default function ProductSpecsPage() {
@@ -48,10 +44,12 @@ export default function ProductSpecsPage() {
           "Content-Type": "application/json",
           "Accept": "application/json"
         },
+        mode: 'cors'
       });
 
       console.log("Response status:", response.status);
       console.log("Response ok:", response.ok);
+      console.log("Response headers:", response.headers);
 
       setDebugInfo(`Response received: ${response.status} ${response.statusText}`);
 
@@ -59,7 +57,7 @@ export default function ProductSpecsPage() {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const data: MotorcycleSpec[] | ApiResponse = await response.json();
+      const data = await response.json();
       console.log("Full API response:", data);
       console.log("Response type:", typeof data);
       console.log("Is array:", Array.isArray(data));
@@ -70,15 +68,15 @@ export default function ProductSpecsPage() {
 
       setDebugInfo(`Data received. Type: ${typeof data}, IsArray: ${Array.isArray(data)}`);
 
-      let items: MotorcycleSpec[] = [];
+      let items = [];
       
       if (Array.isArray(data)) {
         items = data;
         setDebugInfo(`Found array with ${data.length} items`);
-      } else if ('items' in data && Array.isArray(data.items)) {
+      } else if (data.items && Array.isArray(data.items)) {
         items = data.items;
         setDebugInfo(`Found items array with ${data.items.length} items`);
-      } else if ('results' in data && Array.isArray(data.results)) {
+      } else if (data.results && Array.isArray(data.results)) {
         items = data.results;
         setDebugInfo(`Found results array with ${data.results.length} items`);
       } else {
@@ -100,25 +98,28 @@ export default function ProductSpecsPage() {
       }
 
       const searchTerm = searchName.toLowerCase();
-      const matchedHardware = items.find((item) => {
-        const brandMatch = item.brandname?.toLowerCase().includes(searchTerm) ?? false;
-        const processorMatch = item.processor?.toLowerCase().includes(searchTerm) ?? false;
+      const matchedHardware = items.find((item: any) => {
+        const brandMatch = item.brandname?.toLowerCase().includes(searchTerm);
+        const nameMatch = item.name?.toLowerCase().includes(searchTerm);
+        const processorMatch = item.processor?.toLowerCase().includes(searchTerm);
         
         console.log(`Checking item ${item.id}:`, {
           brandname: item.brandname,
+          name: item.name,
           processor: item.processor,
           brandMatch,
+          nameMatch,
           processorMatch
         });
         
-        return brandMatch || processorMatch;
+        return brandMatch || nameMatch || processorMatch;
       });
 
       console.log("Matched hardware:", matchedHardware);
 
       if (!matchedHardware) {
         const availableBrands = items
-          .map((item) => item.brandname ?? "")
+          .map((item: any) => item.brandname || item.name)
           .filter(Boolean)
           .join(", ");
         
@@ -128,14 +129,14 @@ export default function ProductSpecsPage() {
 
       setProduct({
         id: matchedHardware.id,
-        imageUrl: matchedHardware.imageUrl ?? null,
-        brandname: matchedHardware.brandname ?? null,
-        processor: matchedHardware.processor ?? null,
-        graphic: matchedHardware.graphic ?? null,
-        display: matchedHardware.display ?? null,
-        ram: matchedHardware.ram ?? null,
-        storage: matchedHardware.storage ?? null,
-        createdAt: matchedHardware.createdAt ?? new Date().toISOString(),
+        imageUrl: matchedHardware.imageUrl || null,
+        brandname: matchedHardware.brandname || matchedHardware.name || null,
+        processor: matchedHardware.processor || null,
+        graphic: matchedHardware.graphic || null,
+        display: matchedHardware.display || null,
+        ram: matchedHardware.ram || null,
+        storage: matchedHardware.storage || null,
+        createdAt: matchedHardware.createdAt || new Date().toISOString(),
       });
 
       setDebugInfo("Motorcycle found and displayed successfully!");
@@ -166,7 +167,7 @@ export default function ProductSpecsPage() {
   };
 
   const getSpecsList = (product: MotorcycleSpec) => {
-    const specs: string[] = [];
+    const specs = [];
     if (product.processor) specs.push(`Engine: ${product.processor}`);
     if (product.graphic) specs.push(`Power: ${product.graphic}`);
     if (product.display) specs.push(`Type: ${product.display}`);
@@ -178,6 +179,7 @@ export default function ProductSpecsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 py-12">
       <div className="max-w-5xl mx-auto px-6">
+        {/* Header */}
         <div className="text-center mb-10">
           <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 mb-3">
             🔍 Motorcycle Finder
@@ -185,6 +187,7 @@ export default function ProductSpecsPage() {
           <p className="text-gray-300 text-lg">Search our extensive database of motorcycles</p>
         </div>
 
+        {/* Search Section */}
         <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl mb-8 p-8 border border-gray-700">
           <div className="flex items-center space-x-3 mb-6">
             <div className="bg-gradient-to-r from-red-600 to-orange-600 p-2 rounded-lg">
@@ -211,7 +214,7 @@ export default function ProductSpecsPage() {
                 placeholder="e.g., Yamaha, Honda CBR, Kawasaki Ninja, 150cc..."
                 value={searchName}
                 onChange={(e) => setSearchName(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && searchProduct()}
+                onKeyPress={(e) => e.key === "Enter" && searchProduct()}
                 className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400 transition"
                 disabled={loading}
               />
@@ -265,36 +268,36 @@ export default function ProductSpecsPage() {
           </div>
         </div>
 
+        {/* Product Display */}
         {product && (
           <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl border-2 border-red-600 hover:border-orange-600 transition-all p-8">
             <div className="grid md:grid-cols-2 gap-8">
+              {/* Image Section */}
               <div>
                 {product.imageUrl ? (
-                  <img
+                  <Image
                     src={product.imageUrl}
-                    alt={product.brandname ?? "Motorcycle"}
+                    alt={product.brandname || "Motorcycle"}
                     className="rounded-xl w-full h-80 object-cover border-2 border-gray-700"
                     onError={(e) => {
                       console.log("Image failed to load:", product.imageUrl);
-                      e.currentTarget.style.display = 'none';
-                      const placeholder = e.currentTarget.nextElementSibling;
-                      if (placeholder) {
-                        (placeholder as HTMLElement).style.display = 'flex';
-                      }
+                      (e.target as HTMLImageElement).style.display = 'none';
                     }}
                   />
-                ) : null}
-                <div className={`rounded-xl w-full h-80 bg-gray-700 flex items-center justify-center border-2 border-gray-600 ${product.imageUrl ? 'hidden' : ''}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-24 w-24 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
+                ) : (
+                  <div className="rounded-xl w-full h-80 bg-gray-700 flex items-center justify-center border-2 border-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-24 w-24 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                )}
               </div>
 
+              {/* Details Section */}
               <div className="space-y-6">
                 <div>
                   <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 mb-2">
-                    {product.brandname ?? "Unknown Model"}
+                    {product.brandname || "Unknown Model"}
                   </h2>
                   <div className="flex items-center space-x-2 text-gray-400">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -341,6 +344,7 @@ export default function ProductSpecsPage() {
           </div>
         )}
 
+        {/* API Info */}
         <div className="mt-8 p-6 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-400">
           <div className="flex items-center space-x-2 mb-3">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
