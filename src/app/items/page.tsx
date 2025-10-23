@@ -1,3 +1,4 @@
+//src/app/items/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -299,7 +300,7 @@ export default function ItemsPage() {
 
   const [selectedBike, setSelectedBike] = useState<MotorSpec | null>(null);
   const [selectedMethod, setSelectedMethod] = useState<"monthly" | "full">("monthly");
-  const [purchasedMap, setPurchasedMap] = useState<Record<string, { method: string; receiptId: string }>>({});
+  const [, setPurchasedMap] = useState<Record<string, { method: string; receiptId: string }>>({});
 
   useEffect(() => {
     async function fetchMotorSpecs() {
@@ -331,11 +332,12 @@ export default function ItemsPage() {
       setFilteredMotorSpecs(motorSpecs);
     } else {
       const term = searchTerm.toLowerCase();
-      const filtered = motorSpecs.filter((bike) => 
-        bike.description?.toLowerCase().includes(term) ?? 
-        bike.motorName?.toLowerCase().includes(term) ?? 
-        bike.id.toLowerCase().includes(term)
-      );
+      const filtered = motorSpecs.filter((bike) => {
+        const descMatch = bike.description?.toLowerCase().includes(term) ?? false;
+        const nameMatch = bike.motorName?.toLowerCase().includes(term) ?? false;
+        const idMatch = bike.id.toLowerCase().includes(term);
+        return descMatch || nameMatch || idMatch;
+      });
       setFilteredMotorSpecs(filtered);
     }
   }, [searchTerm, motorSpecs]);
@@ -396,7 +398,7 @@ export default function ItemsPage() {
                   <div className="p-6 flex-1 flex flex-col">
                     <div className="mb-4">
                       <h2 className="text-white font-bold text-2xl mb-1">
-                        {bike.motorName || 'Motor Spec'}
+                        {bike.motorName ?? 'Motor Spec'}
                       </h2>
                     </div>
                     <div className="mb-6">
