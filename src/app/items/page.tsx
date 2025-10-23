@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import {
   Search,
   Eye,
@@ -15,6 +14,7 @@ import {
 
 interface MotorSpec {
   id: string;
+  motorName: string | null;
   frontView: string | null;
   sideView: string | null;
   backView: string | null;
@@ -58,11 +58,9 @@ function FullscreenModal({
         <X size={24} />
       </button>
       <div className="relative max-w-6xl max-h-[90vh] w-full h-full flex items-center justify-center">
-        <Image
+        <img
           src={imageUrl}
           alt={description}
-          width={1200}
-          height={800}
           className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         />
@@ -121,11 +119,9 @@ function ImageSlider({ images, description }: { images: (string | null)[]; descr
     <>
       <div className="relative w-full h-full group/slider">
         <div className="relative w-full h-full overflow-hidden cursor-zoom-in" onClick={openFullscreen}>
-          <Image
+          <img
             src={validImages[currentIndex] ?? ""}
             alt={`${description} - ${viewLabels[currentIndex] ?? ""}`}
-            width={800}
-            height={600}
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
           />
 
@@ -189,12 +185,14 @@ function PaymentModal({
   bike,
   onClose,
   onComplete,
+  initialMethod,
 }: {
   bike: MotorSpec;
   onClose: () => void;
   onComplete: (payload: { id: string; method: "monthly" | "full"; receiptId: string }) => void;
+  initialMethod: "monthly" | "full";
 }) {
-  const [method, setMethod] = useState<"monthly" | "full">("monthly");
+  const [method, setMethod] = useState<"monthly" | "full">(initialMethod);
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -233,6 +231,9 @@ function PaymentModal({
         </button>
 
         <h2 className="text-2xl font-bold text-white mb-2">Complete Purchase</h2>
+        {bike.motorName && (
+          <p className="text-xl font-semibold text-red-400 mb-2">{bike.motorName}</p>
+        )}
         <p className="text-gray-400 mb-4">{bike.description ?? "Motor purchase"}</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
@@ -297,6 +298,7 @@ export default function ItemsPage() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const [selectedBike, setSelectedBike] = useState<MotorSpec | null>(null);
+  const [selectedMethod, setSelectedMethod] = useState<"monthly" | "full">("monthly");
   const [purchasedMap, setPurchasedMap] = useState<Record<string, { method: string; receiptId: string }>>({});
 
   useEffect(() => {
@@ -304,8 +306,14 @@ export default function ItemsPage() {
       try {
         const res = await fetch("/api/motor-specs");
         if (!res.ok) throw new Error("Failed to fetch");
-        const data: MotorSpec[] = await res.json();
-        const normalized = data.map((d) => ({ ...d, createdAt: d.createdAt ? new Date(d.createdAt) : new Date() }));
+
+        const data = (await res.json()) as MotorSpec[];
+
+        const normalized = data.map((d) => ({
+          ...d,
+          createdAt: d.createdAt ? new Date(d.createdAt) : new Date(),
+        }));
+
         setMotorSpecs(normalized);
         setFilteredMotorSpecs(normalized);
       } catch (error) {
@@ -323,13 +331,22 @@ export default function ItemsPage() {
       setFilteredMotorSpecs(motorSpecs);
     } else {
       const term = searchTerm.toLowerCase();
-      const filtered = motorSpecs.filter((bike) => bike.description?.toLowerCase().includes(term) ?? bike.id.toLowerCase().includes(term));
+      const filtered = motorSpecs.filter((bike) => 
+        bike.description?.toLowerCase().includes(term) ?? 
+        bike.motorName?.toLowerCase().includes(term) ?? 
+        bike.id.toLowerCase().includes(term)
+      );
       setFilteredMotorSpecs(filtered);
     }
   }, [searchTerm, motorSpecs]);
 
   function handleCompletePayment(payload: { id: string; method: "monthly" | "full"; receiptId: string }) {
     setPurchasedMap((prev) => ({ ...prev, [payload.id]: { method: payload.method, receiptId: payload.receiptId } }));
+  }
+
+  function openPaymentModal(bike: MotorSpec, method: "monthly" | "full") {
+    setSelectedBike(bike);
+    setSelectedMethod(method);
   }
 
   if (loading) {
@@ -354,7 +371,7 @@ export default function ItemsPage() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <input
               type="text"
-              placeholder="Search by description or ID..."
+              placeholder="Search by motor name, description or ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 pl-10 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-red-600 transition-all"
@@ -372,14 +389,18 @@ export default function ItemsPage() {
             {filteredMotorSpecs.map((bike) => (
               <div key={bike.id} className="group">
                 <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border border-gray-700 shadow-xl hover:border-red-600 transition-all overflow-hidden transform hover:-translate-y-2 h-full flex flex-col">
-
                   <div className="relative h-72 bg-gradient-to-br from-red-900/20 to-orange-900/20 overflow-hidden">
-                    <ImageSlider images={[bike.frontView, bike.sideView, bike.backView]} description={bike.description ?? "Motor Spec"} />
+                    <ImageSlider images={[bike.frontView, bike.sideView, bike.backView]} description={bike.motorName ?? bike.description ?? "Motor Spec"} />
                   </div>
 
                   <div className="p-6 flex-1 flex flex-col">
+                    <div className="mb-4">
+                      <h2 className="text-white font-bold text-2xl mb-1">
+                        {bike.motorName || 'Motor Spec'}
+                      </h2>
+                    </div>
                     <div className="mb-6">
-                      <h3 className="text-white font-bold text-lg mb-2">Description</h3>
+                      <h3 className="text-gray-400 font-semibold text-sm mb-2 uppercase tracking-wide">Description</h3>
                       <p className="text-gray-300 text-sm leading-relaxed">{bike.description ?? 'Premium motor model with exceptional performance and reliability.'}</p>
                     </div>
 
@@ -390,7 +411,6 @@ export default function ItemsPage() {
                             <span className="text-sm text-gray-300 font-medium">Monthly Payment</span>
                             <div className="flex items-center">
                               <span className="text-2xl font-bold text-red-400">₱{bike.monthlyPrice}</span>
-                              <span className="text-gray-400 text-sm ml-1">/mo</span>
                             </div>
                           </div>
                         </div>
@@ -407,23 +427,21 @@ export default function ItemsPage() {
                       )}
 
                       <div className="flex gap-3">
-                        <button
-                          onClick={() => setSelectedBike(bike)}
-                          className="flex-1 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white py-3 rounded-lg font-bold text-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
-                        >
-                          Buy Now
-                        </button>
-
-                        {purchasedMap[bike.id] ? (
-                          <div className="w-36 flex items-center justify-center px-3 py-2 rounded-lg bg-gray-800 border border-green-700">
-                            <div>
-                              <p className="text-xs text-gray-300">Purchased</p>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="w-36 flex items-center justify-center px-3 py-2 rounded-lg bg-gray-800 border border-gray-700">
-                            <p className="text-xs text-gray-300">Available</p>
-                          </div>
+                        {bike.monthlyPrice && (
+                          <button
+                            onClick={() => openPaymentModal(bike, "monthly")}
+                            className="flex-1 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white py-3 rounded-lg font-bold text-base transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+                          >
+                            Monthly
+                          </button>
+                        )}
+                        {bike.fullyPaidPrice && (
+                          <button
+                            onClick={() => openPaymentModal(bike, "full")}
+                            className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-3 rounded-lg font-bold text-base transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+                          >
+                            Fully Paid
+                          </button>
                         )}
                       </div>
                     </div>
@@ -440,6 +458,7 @@ export default function ItemsPage() {
           bike={selectedBike}
           onClose={() => setSelectedBike(null)}
           onComplete={handleCompletePayment}
+          initialMethod={selectedMethod}
         />
       )}
     </div>

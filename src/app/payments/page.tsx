@@ -1,3 +1,4 @@
+//src/app/payments
 "use client";
 
 import { useState, useEffect } from "react";
@@ -18,7 +19,7 @@ interface MotorSpec {
 function ImageSlider({ images, name }: { images: (string | null)[], name: string }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   
-  const validImages = images.filter(img => img !== null) as string[];
+ const validImages = images.filter((img): img is string => img !== null);
   
   if (validImages.length === 0) {
     return (

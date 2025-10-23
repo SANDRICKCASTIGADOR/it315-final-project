@@ -135,13 +135,13 @@ export default async function HomePage() {
                       {/* Image Section */}
                       <div className="relative h-56 bg-gradient-to-br from-red-900/20 to-orange-900/20 overflow-hidden">
                         {listing.frontView ? (
-                          <Image
-                            src={listing.frontView}
-                            alt={listing.description || "Motorcycle"}
-                            fill
-                            className="object-cover group-hover:scale-110 transition-transform duration-500"
-                          />
-                        ) : (
+  <Image
+    src={listing.frontView}
+    alt={listing.description ?? "Motorcycle"}
+    fill
+    className="object-cover group-hover:scale-110 transition-transform duration-500"
+  />
+) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <Eye
                               size={48}
@@ -157,7 +157,7 @@ export default async function HomePage() {
                       {/* Content Section */}
                       <div className="p-6">
                         <p className="text-gray-300 text-sm mb-4 line-clamp-2 min-h-[2.5rem]">
-                          {listing.description || "Premium motorcycle model"}
+                          {listing.description ?? "Premium motorcycle model"}
                         </p>
 
                         {/* Pricing */}

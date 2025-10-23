@@ -1,3 +1,4 @@
+//src/app/product
 "use client";
 
 import { useState } from "react";
@@ -219,7 +220,7 @@ export default function ProductSpecsPage() {
                 placeholder="e.g., Yamaha, Honda CBR, Kawasaki Ninja, 150cc..."
                 value={searchName}
                 onChange={(e) => setSearchName(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && void searchProduct()}
+                onKeyDown={(e) => e.key === "Enter" && void searchProduct()}
                 className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400 transition"
                 disabled={loading}
               />

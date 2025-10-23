@@ -46,6 +46,9 @@ export default function TopNav() {
                                 <Link href="/" className="text-gray-300 hover:text-red-500 font-medium transition-colors">
                                     Home
                                 </Link>
+                                <Link href="/cart" className="text-gray-300 hover:text-red-500 font-medium transition-colors">
+                                    Checkout
+                                </Link>
                                 <Link href="/payments" className="text-gray-300 hover:text-red-500 font-medium transition-colors">
                                     Payments
                                 </Link>
